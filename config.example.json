@@ -1,0 +1,9 @@
+{
+    "redis": {
+        "host": "localhost:6379",
+        "password": "password"
+    },
+    "task": {
+        "concurrency": 10
+    }
+}

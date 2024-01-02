@@ -1,0 +1,42 @@
+version: "3"
+
+services:
+  redis:
+    image: redis:7
+    container_name: redis
+    ports:
+      - 6379:6379
+    command: redis-server --requirepass !CnJbIcJqew
+    networks:
+      - transcode-network
+
+  task_ui:
+    image: hibiken/asynqmon:0.7.2
+    container_name: task_ui
+    environment:
+      - REDIS_ADDR=redis:6379
+      - REDIS_PASSWORD=!CnJbIcJqew
+      # - ENABLE_METRICS_EXPORTER=true
+      # - PROMETHEUS_ADDR=http://prometheus:9090
+    ports:
+      - 8080:8080
+    networks:
+      - transcode-network
+    depends_on:
+      - redis
+      # - prometheus
+
+  # prometheus:
+  #   image: prom/prometheus:v2.45.0
+  #   container_name: prometheus
+  #   command:
+  #     - '--config.file=/etc/prometheus/prometheus.yml'
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./prometheus:/etc/prometheus
+  #   networks:
+  #     - transcode-network
+
+networks:
+  transcode-network:
+    driver: bridge
