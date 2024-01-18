@@ -15,8 +15,8 @@ func ConnectRedis() {
 	ClienTask = asynq.NewClient(asynq.RedisClientOpt{Addr: viper.GetString("redis.host"), Password: viper.GetString("redis.password")})
 }
 
-func AddTaskTranscodeStream() {
-	task, err := NewTranscodeStreamTask("localhost:xxx", "live", "hadfasd")
+func AddTaskTranscodeVideo(id string, src string) {
+	task, err := NewTranscodeVideoTask(id, src)
 	if err != nil {
 		fmt.Println("could not create task ", err)
 	}
@@ -25,7 +25,7 @@ func AddTaskTranscodeStream() {
 		log.Fatalf("could not enqueue task: %v", err)
 	}
 
-	var transStream TranscodeStreamPayload
-	json.Unmarshal(info.Payload, &transStream)
-	log.Printf(" [*] Successfully enqueued task: %s", transStream.StreamKey)
+	var transVideo TranscodeVideoPayload
+	json.Unmarshal(info.Payload, &transVideo)
+	log.Printf(" [*] Successfully enqueued task: %s", transVideo)
 }

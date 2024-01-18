@@ -5,5 +5,9 @@
     },
     "task": {
         "concurrency": 10
-    }
+    },
+    "postgresql": {
+        "dsn": "postgresql://root:abc@127.0.0.1:5432/live"
+    },
+    "path_upload": ""
 }
