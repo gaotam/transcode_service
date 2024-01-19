@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"os/signal"
@@ -23,7 +22,6 @@ func main() {
 	go func() { task.StartWorker() }()
 
 	app.Post("/api/v1/live", func(c *fiber.Ctx) error {
-		// task.AddTaskTranscodeStream()
 		payload := struct {
 			LiveKey string `json:"liveKey"`
 		}{}
@@ -32,14 +30,14 @@ func main() {
 			return c.JSON(fiber.Map{"status": 400, "error": err.Error(), "data": nil})
 		}
 
-		var id string
-		var status string
-		err := db.Connect.QueryRow(context.Background(), "SELECT id, status FROM livestreams WHERE \"liveKey\" = $1", payload.LiveKey).Scan(&id, &status)
+		result, err := db.GetLiveByLiveKey(payload.LiveKey)
 		if err != nil {
 			fmt.Print(err)
 			return c.JSON(fiber.Map{"status": 400, "error": err.Error(), "data": nil})
 		}
-		return c.JSON(fiber.Map{"status": 200, "error": nil, "data": fiber.Map{"id:": id, "liveKey": payload.LiveKey, "status": status}})
+
+		task.AddTaskTranscodeLive(result.Id, payload.LiveKey)
+		return c.JSON(fiber.Map{"status": 200, "error": nil, "data": fiber.Map{"id:": result.Id, "liveKey": payload.LiveKey, "status": result.Status}})
 	})
 
 	app.Post("/api/v1/video", func(c *fiber.Ctx) error {
@@ -52,7 +50,7 @@ func main() {
 		}
 
 		var src string
-		err := db.Connect.QueryRow(context.Background(), "SELECT src FROM videos WHERE id = $1", payload.Id).Scan(&src)
+		src, err := db.GetSrcVideoById(payload.Id)
 		if err != nil {
 			fmt.Print(err)
 			return c.JSON(fiber.Map{"status": 400, "error": err.Error(), "data": nil})

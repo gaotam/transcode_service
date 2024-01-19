@@ -1,7 +1,6 @@
 package task
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 
@@ -18,14 +17,24 @@ func ConnectRedis() {
 func AddTaskTranscodeVideo(id string, src string) {
 	task, err := NewTranscodeVideoTask(id, src)
 	if err != nil {
-		fmt.Println("could not create task ", err)
+		fmt.Println("could not create video task ", err)
 	}
-	info, err := ClienTask.Enqueue(task, asynq.Queue("prioritize"))
+	_, err = ClienTask.Enqueue(task, asynq.Queue("prioritize"))
+	if err != nil {
+		log.Fatalf("could not enqueue task: %v", err)
+	}
+	log.Printf(" [*] Successfully enqueued task")
+}
+
+func AddTaskTranscodeLive(id string, liveKey string) {
+	task, err := NewTranscodeLiveTask(id, liveKey)
+	if err != nil {
+		fmt.Println("could not create live task ", err)
+	}
+	_, err = ClienTask.Enqueue(task, asynq.Queue("prioritize"))
 	if err != nil {
 		log.Fatalf("could not enqueue task: %v", err)
 	}
 
-	var transVideo TranscodeVideoPayload
-	json.Unmarshal(info.Payload, &transVideo)
-	log.Printf(" [*] Successfully enqueued task: %s", transVideo)
+	log.Printf(" [*] Successfully enqueued task")
 }

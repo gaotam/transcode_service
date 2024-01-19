@@ -9,5 +9,9 @@
     "postgresql": {
         "dsn": "postgresql://root:abc@127.0.0.1:5432/live"
     },
+    "rtmp": {
+        "host": "localhost",
+        "port": 1935
+    },
     "path_upload": ""
 }
