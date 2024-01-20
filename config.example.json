@@ -11,7 +11,8 @@
     },
     "rtmp": {
         "host": "localhost",
-        "port": 1935
+        "port": 1935,
+        "secret": ""
     },
     "path_upload": ""
 }
