@@ -25,6 +25,7 @@ type TranscodeVideoPayload struct {
 
 type TranscodeLivePayload struct {
 	Id      string
+	App     string
 	LiveKey string
 }
 
@@ -36,8 +37,8 @@ func NewTranscodeVideoTask(id string, src string) (*asynq.Task, error) {
 	return asynq.NewTask(TypeTranscodeVideo, payload), nil
 }
 
-func NewTranscodeLiveTask(id string, liveKey string) (*asynq.Task, error) {
-	payload, err := json.Marshal(TranscodeLivePayload{Id: id, LiveKey: liveKey})
+func NewTranscodeLiveTask(id string, app string, liveKey string) (*asynq.Task, error) {
+	payload, err := json.Marshal(TranscodeLivePayload{Id: id, App: app, LiveKey: liveKey})
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +107,7 @@ func HandleTranscodeLiveTask(ctx context.Context, t *asynq.Task) error {
 	}
 
 	db.UpdateLogById(id, "PROCESS", "")
-	err = utils.FFmpegIns.TranscodeLive(transLive.LiveKey)
+	err = utils.FFmpegIns.TranscodeLive(transLive.App, transLive.LiveKey)
 	if err != nil {
 		db.UpdateLogById(id, "ERROR", err.Error())
 		return fmt.Errorf("transcode error: %v: %w", err, asynq.SkipRetry)

@@ -21,7 +21,7 @@ func main() {
 	defer task.ClienTask.Close()
 	go func() { task.StartWorker() }()
 
-	app.Post("/api/v1/live", func(c *fiber.Ctx) error {
+	app.Post("/api/v1/lives", func(c *fiber.Ctx) error {
 		payload := struct {
 			LiveKey string `json:"liveKey"`
 		}{}
@@ -36,11 +36,11 @@ func main() {
 			return c.JSON(fiber.Map{"status": 400, "error": err.Error(), "data": nil})
 		}
 
-		task.AddTaskTranscodeLive(result.Id, payload.LiveKey)
+		task.AddTaskTranscodeLive(result.Id, result.App, payload.LiveKey)
 		return c.JSON(fiber.Map{"status": 200, "error": nil, "data": fiber.Map{"id:": result.Id, "liveKey": payload.LiveKey, "status": result.Status}})
 	})
 
-	app.Post("/api/v1/video", func(c *fiber.Ctx) error {
+	app.Post("/api/v1/videos", func(c *fiber.Ctx) error {
 		payload := struct {
 			Id string `json:"id"`
 		}{}

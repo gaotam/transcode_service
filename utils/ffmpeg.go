@@ -63,9 +63,9 @@ func (f FFmpeg) TranscodeVideo(id string, src string) (err error) {
 	}
 }
 
-func (f FFmpeg) TranscodeLive(liveKey string) (err error) {
-	rtmpSource := fmt.Sprintf("rtmp://%s:%d/live/%s?secret=%s", viper.GetString("rtmp.host"), viper.GetInt("rtmp.port"), liveKey, viper.GetString("rtmp.secret"))
-	rtmpTranscode := fmt.Sprintf("rtmp://%s:%d/transcode_live/%s", viper.GetString("rtmp.host"), viper.GetInt("rtmp.port"), liveKey)
+func (f FFmpeg) TranscodeLive(app string, liveKey string) (err error) {
+	rtmpSource := fmt.Sprintf("rtmp://%s:%d/%s/%s?secret=%s", viper.GetString("rtmp.host"), viper.GetInt("rtmp.port"), app, liveKey, viper.GetString("rtmp.secret"))
+	rtmpTranscode := fmt.Sprintf("rtmp://%s:%d/t_live/%s", viper.GetString("rtmp.host"), viper.GetInt("rtmp.port"), liveKey)
 
 	args := []string{
 		"-i", rtmpSource, "-filter_complex", "[0:v]scale=w=480:h=360[v360];[0:v]scale=w=640:h=480[v480]; [0:v]scale=w=1280:h=720[v720];[0:v]scale=w=1920:h=1080[v1080]",

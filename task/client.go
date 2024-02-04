@@ -26,8 +26,8 @@ func AddTaskTranscodeVideo(id string, src string) {
 	log.Printf(" [*] Successfully enqueued task")
 }
 
-func AddTaskTranscodeLive(id string, liveKey string) {
-	task, err := NewTranscodeLiveTask(id, liveKey)
+func AddTaskTranscodeLive(id string, app string, liveKey string) {
+	task, err := NewTranscodeLiveTask(id, app, liveKey)
 	if err != nil {
 		fmt.Println("could not create live task ", err)
 	}
