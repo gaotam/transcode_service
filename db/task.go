@@ -29,5 +29,8 @@ func UpdateLogById(id string, status string, state string) (err error) {
 		return
 	}
 	_, err = Connect.Exec(context.Background(), "UPDATE tasks SET status = $1, state = $2 WHERE id = $3", status, state, id)
+	if err != nil {
+		return err
+	}
 	return nil
 }

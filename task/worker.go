@@ -51,6 +51,7 @@ func HandleTranscodeVideoTask(ctx context.Context, t *asynq.Task) error {
 		return fmt.Errorf("json.Unmarshal failed: %v: %w", err, asynq.SkipRetry)
 	}
 
+	fileName := utils.GetFileName(transVideo.Src)
 	metadata := map[string]string{
 		"videoType":   "hls",
 		"encodeVideo": "H.264",
@@ -71,12 +72,18 @@ func HandleTranscodeVideoTask(ctx context.Context, t *asynq.Task) error {
 	}
 
 	db.UpdateLogById(id, "PROCESS", "")
-	err = utils.FFmpegIns.TranscodeVideo(id, transVideo.Src)
+	err = utils.FFmpegIns.TranscodeVideo(fileName, transVideo.Src)
 	if err != nil {
 		db.UpdateLogById(id, "ERROR", err.Error())
 		return fmt.Errorf("transcode error: %v: %w", err, asynq.SkipRetry)
 	}
 	db.UpdateLogById(id, "SUCCESS", "")
+
+	err = db.UpdateSrcTranscode(transVideo.Id, fileName)
+	if err != nil {
+		return fmt.Errorf("transcode error: %v: %w", err, asynq.SkipRetry)
+	}
+
 	log.Printf(" [*] transcode video %s SUCCESS", transVideo.Src)
 	return nil
 }
