@@ -72,14 +72,19 @@ func HandleTranscodeVideoTask(ctx context.Context, t *asynq.Task) error {
 	}
 
 	db.UpdateLogById(id, "PROCESS", "")
-	err = utils.FFmpegIns.TranscodeVideo(fileName, transVideo.Src)
+	resolution, err := utils.FFmpegIns.GetResolution(transVideo.Src)
+	if err != nil {
+		return fmt.Errorf("transcode error: %v: %w", err, asynq.SkipRetry)
+	}
+
+	err = utils.FFmpegIns.TranscodeVideo(fileName, transVideo.Src, resolution)
 	if err != nil {
 		db.UpdateLogById(id, "ERROR", err.Error())
 		return fmt.Errorf("transcode error: %v: %w", err, asynq.SkipRetry)
 	}
 	db.UpdateLogById(id, "SUCCESS", "")
 
-	err = db.UpdateSrcTranscode(transVideo.Id, fileName)
+	err = db.UpdateVideoById(transVideo.Id, fileName, resolution)
 	if err != nil {
 		return fmt.Errorf("transcode error: %v: %w", err, asynq.SkipRetry)
 	}
