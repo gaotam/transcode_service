@@ -42,6 +42,7 @@ func (f FFmpeg) GetResolution(src string) (result int, err error) {
 	width, _ := strconv.Atoi(parts[0])
 	height, _ := strconv.Atoi(strings.TrimSpace(parts[1]))
 
+	fmt.Println("check ", width, height)
 	if width >= 640 && width < 854 && height == 360 {
 		return 360, nil
 	}
@@ -50,11 +51,11 @@ func (f FFmpeg) GetResolution(src string) (result int, err error) {
 		return 480, nil
 	}
 
-	if width >= 1280 && width < 1920 && height == 720 {
+	if width >= 1080 && width < 1920 && height >= 500 && height <= 720 {
 		return 720, nil
 	}
 
-	if width >= 1920 && width < 2560 && height == 1080 {
+	if width >= 1920 && width < 2560 && height >= 500 && height <= 1080 {
 		return 1080, nil
 	}
 
